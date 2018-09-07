@@ -6,7 +6,7 @@ using namespace std;
 
 char **tabuleiro;
 set< pair< pair<int, int> , int > > s; //set que armazenas todas as DIFERENTES possibilidades de vitoria
-vector< pair<int, int> > v; //vector que armazenas todas as possibilidades de vitoria
+int contador = 0;
 
 //essa matriz representa todos os possiveis movimentos no tabuleiro
 char movimentos[4][2] = {1, 0, //indo para direita (movendo no eixo x -> eixo das colunas)
@@ -35,12 +35,12 @@ void imprimeTabuleiro(int linha, int coluna){
 bool movimentoValido(int iAtual, int jAtual, int iProximo, int jProximo, int linha, int coluna){
 	if((iProximo >= 0 && iProximo < linha) && (jProximo >= 0 && jProximo < coluna) && tabuleiro[iProximo][jProximo] != 0){
 		if((tabuleiro[iAtual][jAtual] == 3 && tabuleiro[iProximo][jProximo] == 1) ||(tabuleiro[iAtual][jAtual] - tabuleiro[iProximo][jProximo] == -1)){
-		//	printf("na funcao movimento valido: de (%d, %d) = %d para (%d, %d) = %d \n", iAtual, jAtual, tabuleiro[iAtual][jAtual] , iProximo, jProximo, tabuleiro[iProximo][jProximo]);
 			return true;
 		}
 	}
 	return false;
 }
+
 
 /**
 *	Funcao que acha todas as diferentes configuracoes de vitoria atraves
@@ -51,7 +51,7 @@ void backtrack(int n, int linha, int coluna){
 		for(int i=0; i<linha; i++){ //procurando pelo vencedor
 			for(int j=0; j<coluna; j++){
 				if(tabuleiro[i][j] != 0){
-					v.pb(make_pair(i,j));
+					contador++;
 					s.insert(make_pair(make_pair(i,j), tabuleiro[i][j]));		
 				}
 			} 
@@ -82,66 +82,45 @@ void backtrack(int n, int linha, int coluna){
 }
 
 /**
-*	Essa funcao imprime a saida de acordo com as especificacoes, ordenando os resultados de acordo com a linha, desempatando pela coluna e depois pelo tipo do objeto
+*	Funcao de comparacao para ordenacao da saida
+*	1) Ordenada de acordo com a linha do resultado
+*	2) Desempata com a coluna
+*	3) Desempata com o numero do objeto
 **/
+bool compara(pair <pair <int, int> , int> p1 , pair <pair <int, int> , int> p2){
+	pair<int , int> temp1 = get<0>(p1);
+	pair<int,int> temp2 = get<0>(p2);
+	int a1 = get<0>(temp1), a2 = get<1>(temp1), a3 = get<1>(p1);
+	int b1 = get<0>(temp2), b2 = get<1>(temp2), b3 = get<1>(p2);
+
+	if(a1 < b1){
+		return true;
+	}else if(a1 == b1){
+		if(a2 < b2){
+			return true;
+		}else if(a2 == b2){
+			if(a3 < b3)
+				return true;
+			else
+				return false;
+		}
+	}
+	return false;
+}	
 
 void imprimeSaida(){
-	vector<int> linhas;
-	vector<int> colunas;
-	vector<int> objetos;
-	pair<int, int> aux;
-	int  aux2;
+	vector<pair <pair <int, int> , int> > aux;
 	for(auto u : s){
-		aux = u.first;
-		aux2 = u.second;
-		linhas.pb(aux.first);
-		colunas.pb(aux.second);
-		objetos.pb(aux2);
+		aux.pb(u);
 	}
-	for(int i=0; i<(int)linhas.size()-1; i++){
-		if(linhas[i] > linhas[i+1]){
-			int temp = linhas[i+1];
-			linhas[i+1] = linhas[i];
-			linhas[i] = temp;
-			temp = colunas[i+1];
-			colunas[i+1] = colunas[i];
-			colunas[i] = temp;
-			temp = objetos[i+1];
-			objetos[i+1] = objetos[i];
-			objetos[i] = temp;
-		}else if(linhas[i] == linhas[i+1]){
-			if(colunas[i] > colunas[i+1]){			
-				int temp = linhas[i+1];
-				linhas[i+1] = linhas[i];
-				linhas[i] = temp;
-				temp = colunas[i+1];
-				colunas[i+1] = colunas[i];
-				colunas[i] = temp;
-				temp = objetos[i+1];
-				objetos[i+1] = objetos[i];
-				objetos[i] = temp;
-
-			}else if(colunas[i] == colunas[i+1]){
-				if(objetos[i] > objetos[i+1]){			
-					int temp = linhas[i+1];
-					linhas[i+1] = linhas[i];
-					linhas[i] = temp;
-					temp = colunas[i+1];
-					colunas[i+1] = colunas[i];
-					colunas[i] = temp;
-					temp = objetos[i+1];
-					objetos[i+1] = objetos[i];
-					objetos[i] = temp;
-				}
-
-			}
-
-		}
-		
-	}
-	for(int i=0; i< (int)linhas.size(); i++)
-		printf("%d %d %d\n", linhas[i]+1, colunas[i]+1, objetos[i]);	
+	sort(aux.begin(), aux.end(), compara);
+	for(auto u : aux){
+		pair<int , int> temp1 = get<0>(u);
+		int a1 = get<0>(temp1), a2 = get<1>(temp1), a3 = get<1>(u);
+		printf("%d %d %d\n", a1+1, a2+1, a3);
+	}	
 }
+
 
 int main(int argc, char const *argv[])
 {
@@ -169,7 +148,7 @@ int main(int argc, char const *argv[])
 	
 
 	backtrack(nroPecas, linha, coluna);
-	printf("%d\n", (int)v.size());
+	printf("%d\n", contador);
 	printf("%d\n", (int)s.size());	
 	imprimeSaida();
 	
