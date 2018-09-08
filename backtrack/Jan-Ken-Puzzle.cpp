@@ -125,7 +125,7 @@ void imprimeSaida(){
 int main(int argc, char const *argv[])
 {
 	int linha, coluna;
-	int nroPecas;
+	int nroPecas = 0;
 
 	scanf("%d %d", &linha, &coluna);
 
