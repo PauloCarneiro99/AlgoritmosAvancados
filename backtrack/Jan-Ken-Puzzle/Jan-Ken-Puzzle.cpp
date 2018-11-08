@@ -1,8 +1,15 @@
 #include <bits/stdc++.h>
 
+/*
+	COMPILE ESSE CODIGO USANDO:
+			g++ Jan-Ken-Puzzle.cpp -std=c++11 
+*/
+
+
 using namespace std;
 
 #define pb push_back
+
 
 char **tabuleiro;
 set< pair< pair<int, int> , int > > s; //set que armazenas todas as DIFERENTES possibilidades de vitoria
@@ -88,10 +95,10 @@ void backtrack(int n, int linha, int coluna){
 *	3) Desempata com o numero do objeto
 **/
 bool compara(pair <pair <int, int> , int> p1 , pair <pair <int, int> , int> p2){
-	pair<int , int> temp1 = get<0>(p1);
-	pair<int,int> temp2 = get<0>(p2);
-	int a1 = get<0>(temp1), a2 = get<1>(temp1), a3 = get<1>(p1);
-	int b1 = get<0>(temp2), b2 = get<1>(temp2), b3 = get<1>(p2);
+	pair<int , int> temp1 = (p1).first;
+	pair<int,int> temp2 = (p2).first;
+	int a1 = (temp1).first, a2 = (temp1).second, a3 = (p1).second;
+	int b1 = (temp2).first, b2 = (temp2).second, b3 = (p2).second;
 
 	if(a1 < b1){
 		return true;
