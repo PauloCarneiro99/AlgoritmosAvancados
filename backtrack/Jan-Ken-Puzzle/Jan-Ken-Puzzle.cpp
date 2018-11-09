@@ -165,3 +165,4 @@ int main(int argc, char const *argv[])
 	free(tabuleiro);
 	return 0;
 }
+	
