@@ -13,10 +13,14 @@ using namespace std;
 unordered_map<long long,long long> m;
 
 char tabuleiro[20][20];
-set< pair< pair<int, int> , int > > s; //set que armazenas todas as DIFERENTES possibilidades de vitoria
-set< pair< pair<int, int> , int > > temp;
+set<long long> s; //set que armazenas todas as DIFERENTES possibilidades de vitoria
 
 long long contador = 0;
+
+
+char visitado[20][20]; //variaveis utilizadas como auxiliar na funcao para checar se existe uma ilha
+int cont2;
+
 
 long long t = 0; //variavel que ira armazenar o conteudo do tabuleiro convertido para base 4
 int conversion = 4; //variavel auxiliar na operacao de converter o tabuleiro para base 4
@@ -60,8 +64,9 @@ bool movimentoValido(int iAtual, int jAtual, int iProximo, int jProximo, int lin
 **/
 void verificaIlha(int i, int j,int linha, int coluna, int n){
 	for(int k=0; k<4; k++){
-		if(i + movimentos[k][0] < linha && i + movimentos[k][0] >= 0 && j + movimentos[k][1] < coluna &&  j + movimentos[k][1] >= 0 && (tabuleiro[i + movimentos[k][0]][j + movimentos[k][1]] != 0) && temp.count(make_pair(make_pair(i + movimentos[k][0],j + movimentos[k][1]),tabuleiro[i + movimentos[k][0]][j + movimentos[k][1]])) == 0){
-			temp.insert(make_pair(make_pair(i + movimentos[k][0], j + movimentos[k][1]),tabuleiro[i + movimentos[k][0]][j + movimentos[k][1]]));
+		if(i + movimentos[k][0] < linha && i + movimentos[k][0] >= 0 && j + movimentos[k][1] < coluna &&  j + movimentos[k][1] >= 0 && (tabuleiro[i + movimentos[k][0]][j + movimentos[k][1]] != 0) && visitado[i + movimentos[k][0]][j + movimentos[k][1]] == -1){
+			cont2++;
+			visitado[i + movimentos[k][0]][j + movimentos[k][1]] = 1;
 			verificaIlha(i + movimentos[k][0], j + movimentos[k][1], linha, coluna, n);
 		}
 	}
@@ -72,10 +77,8 @@ void verificaIlha(int i, int j,int linha, int coluna, int n){
 *	Return false se nao foi formada nenhuma ilha nesse elemento
 **/
 bool isIlha(int i, int j,int linha, int coluna, int n){
-	temp.clear();
-	temp.insert(make_pair(make_pair(i,j),tabuleiro[i][j]));
 	verificaIlha(i,j,linha,coluna,n);
-	if((int)temp.size() != n){
+	if(cont2 != n){
 		return true;
 	}
 	else
@@ -89,10 +92,19 @@ bool isIlha(int i, int j,int linha, int coluna, int n){
 **/
 bool ilha(int linha, int coluna, int n){
 	int i,j;
+	cont2 = 0;
 	bool f = false;
+	for(i = 0; i<linha; i++){
+		for(j=0; j<coluna; j++){
+			visitado[i][j] = -1;
+		}
+	}
+	
 	for(i=0; i<linha; i++){
 		for(j=0; j<coluna; j++){
 			if(tabuleiro[i][j] != 0){
+				cont2++;
+				visitado[i][j] = 1;
 				f = true;
 				break;
 			}
@@ -122,15 +134,9 @@ void tabuleiroBase4(int linha, int coluna){
 long long backtrack(int n, int linha, int coluna){
 	long long aux =0;
 	if(n == 1){
-		for(int i=0; i<linha; i++){ //procurando pelo vencedor
-			for(int j=0; j<coluna; j++){
-				if(tabuleiro[i][j] != 0){
-					contador++;
-					s.insert(make_pair(make_pair(i,j), tabuleiro[i][j]));
-					return 1;		
-				}
-			} 
-		}
+		s.insert(t);
+		contador++;
+		return 1;
 	}else if(m.count(t) != 0){
 		contador += m[t];
 		return m[t];
@@ -170,38 +176,26 @@ long long backtrack(int n, int linha, int coluna){
 	return m[t] = aux;
 }
 
-/**
-*	Funcao de comparacao para ordenacao da saida
-*	1) Ordenada de acordo com a linha do resultado
-*	2) Desempata com a coluna
-*	3) Desempata com o numero do objeto
-**/
-bool compara(pair <pair <int, int> , int> p1 , pair <pair <int, int> , int> p2){
-	pair<int , int> temp1 = (p1).first;
-	pair<int,int> temp2 = (p2).first;
-	int a1 = (temp1).first, a2 = (temp1).second, a3 = (p1).second;
-	int b1 = (temp2).first, b2 = (temp2).second, b3 = (p2).second;
 
-	if(a1 < b1){
-		return true;
-	}else if(a1 == b1){
-		if(a2 < b2){
-			return true;
-		}else if(a2 == b2){
-			if(a3 < b3)
-				return true;
-			else
-				return false;
+void imprimeSaida(int linha, int coluna){
+	set<pair<pair<int,int> , int> > resposta;
+	for(auto u: s){
+		bool flag = false;
+		for(int i=0; i<linha; i++){
+			for(int j=0; j<coluna; j++){
+				long long aux = u%4;
+				u = u/4;
+				if(aux != 0){
+					resposta.insert(make_pair(make_pair(i,j),aux));
+					flag = true;
+					break;
+				}
+			}
+			if(flag == true)
+				break;
 		}
 	}
-	return false;
-}	
-
-/**
-*	Funcao que imprime o Set contendo as diferentes respostas de maneira ordenada
-**/
-void imprimeSaida(){
-	for(auto u : s){
+	for(auto u : resposta){
 		pair<int , int> temp1 = (u).first	;
 		int a1 = (temp1).first, a2 = (temp1).second, a3 = (u).second;
 		printf("%d %d %d\n", a1+1, a2+1, a3);
@@ -232,7 +226,7 @@ int main(int argc, char const *argv[])
 	backtrack(nroPecas, linha, coluna);
 	printf("%lld\n", contador);
 	printf("%d\n", (int)s.size());	
-	imprimeSaida();
+	imprimeSaida(linha,coluna);
 	
 	return 0;
 }
