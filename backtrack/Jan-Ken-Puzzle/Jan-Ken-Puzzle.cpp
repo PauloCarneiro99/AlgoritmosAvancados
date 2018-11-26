@@ -122,8 +122,8 @@ void imprimeSaida(){
 	}
 	sort(aux.begin(), aux.end(), compara);
 	for(auto u : aux){
-		pair<int , int> temp1 = get<0>(u);
-		int a1 = get<0>(temp1), a2 = get<1>(temp1), a3 = get<1>(u);
+		pair<int , int> temp1 = (u).first;
+		int a1 = (temp1).first, a2 = (temp1).second, a3 = (u).second;
 		printf("%d %d %d\n", a1+1, a2+1, a3);
 	}	
 }
