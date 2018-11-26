@@ -11,7 +11,7 @@ vector<int> memo;
 //portanto no final fibDp eh O(n) de tempo e O(n) de memoria
 int fibDp(int n){
 	if(memo[n] != -1) return memo[n];
-	if(n <=2) return 1;
+	if(n <2) return 1;
 	else{
 		memo[n] = fibDp(n-1) + fibDp(n-2);
 		return memo[n]; 
@@ -19,7 +19,7 @@ int fibDp(int n){
 }
 //fib recursivo sem DP , complixedade exponencial
 int fib(int n){
-	if(n <= 2) return 1;
+	if(n < 2) return 1;
 	else return fib(n-1) + fib(n-2);
 }
 
