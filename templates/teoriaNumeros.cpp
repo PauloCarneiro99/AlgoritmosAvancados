@@ -5,12 +5,13 @@ using namespace std;
 int vet_crivo[47000];
 vector<int> crv;
 
+//aux = sqrt(n)
 void crivo(int n, int aux){
 	memset(vet_crivo, 0, sizeof(vet_crivo));
 	for(int i=2; i<aux; i++){
 		if(vet_crivo[i]==0){
 			crv.pb(i);
-			for(int j=i+i; j<aux; j = j*i){
+			for(int j=i+i; j<n; j = j+i){
 				vet_crivo[j] = -1;
 			}
 		}
