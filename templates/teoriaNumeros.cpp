@@ -2,6 +2,8 @@
 
 using namespace std;
 
+#define pb push_back
+
 int vet_crivo[47000];
 vector<int> crv;
 
